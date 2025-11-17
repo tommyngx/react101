@@ -1,58 +1,141 @@
-import React from 'react'
+import React, { useState } from 'react'
 
-function Feature({ title, children }) {
-  return (
-    <div style={{ marginBottom: 14 }}>
-      <h3 style={{ margin: '6px 0' }}>{title}</h3>
-      <p style={{ margin: 0 }}>{children}</p>
-    </div>
-  )
+function getBmiCategory(bmi) {
+  if (bmi < 18.5) return 'Gầy'
+  if (bmi < 25) return 'Bình thường'
+  if (bmi < 30) return 'Thừa cân'
+  return 'Béo phì'
 }
 
 export default function App() {
+  const [height, setHeight] = useState('')
+  const [weight, setWeight] = useState('')
+  const [bmi, setBmi] = useState(null)
+  const [category, setCategory] = useState('')
+
+  const bmiRanges = [
+    { label: 'Gầy', min: 0, max: 18.5, color: '#38bdf8' },
+    { label: 'Bình thường', min: 18.5, max: 25, color: '#22c55e' },
+    { label: 'Thừa cân', min: 25, max: 30, color: '#facc15' },
+    { label: 'Béo phì', min: 30, max: 40, color: '#ef4444' }
+  ]
+
+  const handleSubmit = (event) => {
+    event.preventDefault()
+    const h = parseFloat(height) / 100
+    const w = parseFloat(weight)
+
+    if (!h || !w) {
+      setBmi(null)
+      setCategory('')
+      return
+    }
+
+    const bmiValue = w / (h * h)
+    setBmi(bmiValue)
+    setCategory(getBmiCategory(bmiValue))
+  }
+
+  const bmiPos = bmi && bmi > 0 ? Math.min(40, Math.max(0, bmi)) : null
+
   return (
-    <div style={{ fontFamily: 'Arial, sans-serif', padding: 24, maxWidth: 860, margin: '0 auto' }}>
-      <header>
-        <h1 style={{ marginBottom: 6 }}>React101</h1>
-        <p style={{ marginTop: 0, color: '#374151' }}>Ứng dụng React nhỏ để demo deploy lên GitHub Pages.</p>
+    <div style={{ fontFamily: 'Arial, sans-serif', padding: 24, maxWidth: 420, margin: '0 auto', background: '#f8fafc', borderRadius: 12, boxShadow: '0 2px 12px #0001' }}>
+      <header style={{ textAlign: 'center', marginBottom: 24 }}>
+        <h1 style={{ margin: 0, color: '#2563eb' }}>BMI Calculator</h1>
+        <p style={{ color: '#64748b', margin: 0 }}>Tính chỉ số khối cơ thể (Body Mass Index)</p>
       </header>
 
-      <main style={{ marginTop: 20 }}>
-        <section style={{ marginBottom: 18 }}>
-          <h2 style={{ marginBottom: 8 }}>Giới thiệu</h2>
-          <p style={{ marginTop: 0 }}>
-            Đây là một project khởi tạo bằng Vite + React. Mục tiêu là một ví dụ đơn giản để triển khai lên
-            GitHub Pages tại đường dẫn <strong>https://tommyngx.github.io/react101</strong>.
-          </p>
-        </section>
+      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+        <label>
+          Chiều cao (cm):
+          <input
+            type="number"
+            min="80"
+            max="250"
+            step="0.1"
+            value={height}
+            onChange={(e) => setHeight(e.target.value)}
+            style={{ width: '100%', padding: 8, marginTop: 4, borderRadius: 6, border: '1px solid #cbd5e1' }}
+            required
+          />
+        </label>
+        <label>
+          Cân nặng (kg):
+          <input
+            type="number"
+            min="20"
+            max="250"
+            step="0.1"
+            value={weight}
+            onChange={(e) => setWeight(e.target.value)}
+            style={{ width: '100%', padding: 8, marginTop: 4, borderRadius: 6, border: '1px solid #cbd5e1' }}
+            required
+          />
+        </label>
+        <button type="submit" style={{ background: '#2563eb', color: 'white', border: 'none', borderRadius: 6, padding: 10, fontWeight: 600, fontSize: 16, cursor: 'pointer' }}>
+          Tính BMI
+        </button>
+      </form>
 
-        <section style={{ marginBottom: 18 }}>
-          <h2 style={{ marginBottom: 8 }}>Tính năng</h2>
-          <Feature title="Khởi động nhanh">Sử dụng Vite để dev server rất nhanh và build tối ưu cho production.</Feature>
-          <Feature title="Cấu trúc rõ ràng">File nhỏ, dễ chỉnh sửa: mở `src/App.jsx` để sửa nội dung.</Feature>
-          <Feature title="Sẵn sàng deploy">Workflow Actions đã được thêm sẵn để deploy lên GitHub Pages tự động.</Feature>
-        </section>
+      <div style={{ marginTop: 32, marginBottom: 8 }}>
+        <div style={{ fontWeight: 600, color: '#334155', marginBottom: 6 }}>Biểu đồ vùng BMI</div>
+        <div style={{ position: 'relative', height: 32, background: '#e5e7eb', borderRadius: 8, display: 'flex', overflow: 'hidden' }}>
+          {bmiRanges.map((range, idx) => (
+            <div
+              key={range.label}
+              style={{
+                flex: range.max - range.min,
+                background: range.color,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#fff',
+                fontSize: 13,
+                fontWeight: 600,
+                opacity: 0.85,
+                borderRight: idx < bmiRanges.length - 1 ? '2px solid #f1f5f9' : 'none'
+              }}
+            >
+              {range.label}
+            </div>
+          ))}
+          {bmiPos !== null && (
+            <div
+              style={{
+                position: 'absolute',
+                left: `${(bmiPos / 40) * 100}%`,
+                top: 0,
+                bottom: 0,
+                width: 3,
+                background: '#0ea5e9',
+                borderRadius: 2,
+                boxShadow: '0 0 6px #0ea5e9',
+                zIndex: 2,
+                transition: 'left 0.3s'
+              }}
+            />
+          )}
+        </div>
+        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, color: '#64748b', marginTop: 2 }}>
+          <span>0</span>
+          <span>18.5</span>
+          <span>25</span>
+          <span>30</span>
+          <span>40+</span>
+        </div>
+      </div>
 
-        <section style={{ marginBottom: 18 }}>
-          <h2 style={{ marginBottom: 8 }}>Hướng dẫn nhanh</h2>
-          <ol>
-            <li>Chạy `npm install` để cài dependencies.</li>
-            <li>Chạy `npm run dev` để xem bản dev.</li>
-            <li>Push lên repo `main` — Actions sẽ build và deploy vào vài phút.</li>
-          </ol>
-        </section>
+      {bmi && (
+        <div style={{ marginTop: 24, textAlign: 'center', background: '#fff', borderRadius: 8, padding: 16, boxShadow: '0 1px 4px #0001' }}>
+          <div style={{ fontSize: 22, fontWeight: 700, color: '#2563eb' }}>BMI: {bmi.toFixed(2)}</div>
+          <div style={{ fontSize: 18, marginTop: 8, color: '#0f172a' }}>
+            Phân loại: <strong>{category}</strong>
+          </div>
+        </div>
+      )}
 
-        <section>
-          <h2 style={{ marginBottom: 8 }}>Liên kết</h2>
-          <ul>
-            <li><a href="https://github.com/tommyngx/react101" target="_blank" rel="noreferrer">Repo trên GitHub</a></li>
-            <li><a href="https://tommyngx.github.io/react101" target="_blank" rel="noreferrer">Trang GitHub Pages (sau khi deploy)</a></li>
-          </ul>
-        </section>
-      </main>
-
-      <footer style={{ marginTop: 30, borderTop: '1px solid #e5e7eb', paddingTop: 12, color: '#6b7280' }}>
-        © {new Date().getFullYear()} tommyngx — React101 (v1.1)
+      <footer style={{ marginTop: 32, textAlign: 'center', color: '#6b7280', fontSize: 14 }}>
+        © {new Date().getFullYear()} tommyngx — BMI App
       </footer>
     </div>
   )
