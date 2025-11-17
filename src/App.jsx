@@ -52,7 +52,7 @@ export default function App() {
       </main>
 
       <footer style={{ marginTop: 30, borderTop: '1px solid #e5e7eb', paddingTop: 12, color: '#6b7280' }}>
-        © {new Date().getFullYear()} tommyngx — React101 (v1.0)
+        © {new Date().getFullYear()} tommyngx — React101 (v1.1)
       </footer>
     </div>
   )
