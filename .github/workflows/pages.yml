@@ -24,10 +24,10 @@ jobs:
       - name: Build
         run: npm run build
       - name: Upload artifact for GitHub Pages
-        # use v2 which depends on newer upload-artifact runtime
-        uses: actions/upload-pages-artifact@v2
+        # use latest v3 which no longer depends on deprecated upload-artifact v3
+        uses: actions/upload-pages-artifact@v3
         with:
           path: ./dist
       - name: Deploy to GitHub Pages
-        # keep deploy-pages@v1 (stable); update if newer is available
-        uses: actions/deploy-pages@v1
+        # update to v2 which includes improvements over v1
+        uses: actions/deploy-pages@v2
