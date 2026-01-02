@@ -30,8 +30,8 @@ const bmiRangesData = {
 }
 
 export default function App() {
-  const [height, setHeight] = useState(170)
-  const [weight, setWeight] = useState(65)
+  const [height, setHeight] = useState(177)
+  const [weight, setWeight] = useState(79)
   const [reference, setReference] = useState('caucasian')
 
   const bmi = useMemo(() => {
